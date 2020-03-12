@@ -22,7 +22,7 @@ import java.lang.annotation.*
      *
      * The final destination will be {@code ${basePath}/Unity-${version}}
      */
-    String basePath() default ""
+    String basePath() default "build/unity"
 
     /**
      * A list of {@code Component} to be installed.                                                                  |

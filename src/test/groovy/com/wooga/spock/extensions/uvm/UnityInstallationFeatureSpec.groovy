@@ -1,41 +1,43 @@
 package com.wooga.spock.extensions.uvm
 
 import net.wooga.uvm.Installation
-import net.wooga.uvm.UnityVersionManager
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
 
 @Stepwise
 class UnityInstallationFeatureSpec extends Specification {
     def setupSpec() {
-        if (UnityVersionManager.locateUnityInstallation("2019.3.3f1")) {
-            UnityVersionManager.locateUnityInstallation("2019.3.3f1").location.deleteDir()
+        if (unityInstallDir.exists()) {
+            unityInstallDir.deleteDir()
         }
     }
 
+    @Shared
+    File unityInstallDir = new File("build/unity/Unity-2019.3.3f1").absoluteFile
+
     def "before feature spec (unity is not installed)"() {
         expect:
-        !UnityVersionManager.locateUnityInstallation("2019.3.3f1")
+        !unityInstallDir.exists()
     }
 
     @UnityInstallation(version = "2019.3.3f1", cleanup = true)
     def "feature has unity installed before execution"(Installation installation) {
         expect:
-        installation.location.exists()
-        UnityVersionManager.locateUnityInstallation("2019.3.3f1")
+        unityInstallDir.exists()
+        installation.location == unityInstallDir
     }
 
     def "after feature spec (unity is not installed)"() {
         expect:
-        !UnityVersionManager.locateUnityInstallation("2019.3.3f1")
+        !unityInstallDir.exists()
     }
 
     @UnityInstallation(version = "2019.3.3f1", cleanup = true)
     def "feature has unity installed before execution"(String a, String b, Installation installation) {
         expect:
-        installation.location.exists()
-        UnityVersionManager.locateUnityInstallation("2019.3.3f1")
-
+        unityInstallDir.exists()
+        installation.location == unityInstallDir
         where:
         a      | b
         "test" | "test2"
