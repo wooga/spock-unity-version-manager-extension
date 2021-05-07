@@ -29,7 +29,7 @@ import org.spockframework.runtime.model.NodeInfo
 abstract class UnityInstallationManagingInterceptor<T extends NodeInfo> extends AbstractMethodInterceptor {
 
     protected final UnityInstallation metadata
-
+    protected Boolean shouldClean = false
     private T info
 
     T getInfo() {
@@ -46,14 +46,26 @@ abstract class UnityInstallationManagingInterceptor<T extends NodeInfo> extends 
     }
 
     Installation installUnity(IMethodInvocation invocation) {
+
+        def installation = UnityVersionManager.locateUnityInstallation(metadata.version())
+        shouldClean = metadata.cleanup()
+        if (installation) {
+            installation.getComponents()
+            if (!metadata.modules().every { installation.components.contains(it) }) {
+                UnityVersionManager.installUnityEditor(metadata.version(), installation.location, metadata.modules())
+            }
+            shouldClean = false
+            return installation
+        }
+
         File destination = null
-        if(metadata.basePath() != "") {
+        if (metadata.basePath() != "") {
             destination = new File(metadata.basePath(), "Unity-${metadata.version()}")
         } else if (metadata.cleanup()) {
             destination = File.createTempDir(this.metadata.version(), "")
         }
 
-        if(destination) {
+        if (destination) {
             UnityVersionManager.installUnityEditor(metadata.version(), destination, metadata.modules())
         } else {
             UnityVersionManager.installUnityEditor(metadata.version(), this.metadata.modules())
