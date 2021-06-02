@@ -1,6 +1,7 @@
 package com.wooga.spock.extensions.uvm
 
 import net.wooga.uvm.Installation
+import net.wooga.uvm.UnityVersionManager
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
@@ -43,4 +44,6 @@ class UnityInstallationFeatureSpec extends Specification {
         "test" | "test2"
         installation = null
     }
+
+
 }

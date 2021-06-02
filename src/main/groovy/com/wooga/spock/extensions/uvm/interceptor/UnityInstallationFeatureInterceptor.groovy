@@ -110,6 +110,8 @@ class UnityInstallationFeatureInterceptor extends UnityInstallationManagingInter
 
     @Override
     void deleteInstallation(IMethodInvocation invocation) {
-        installation.location.deleteDir()
+        if(shouldClean) {
+            installation.location.deleteDir()
+        }
     }
 }

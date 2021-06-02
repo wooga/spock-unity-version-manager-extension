@@ -37,8 +37,10 @@ abstract class UnityInstallationFieldInterceptor extends UnityInstallationManagi
 
     @Override
     void deleteInstallation(IMethodInvocation invocation) {
-        Installation installation = getInstallation(invocation)
-        installation.location.deleteDir()
+        if(shouldClean) {
+            Installation installation = getInstallation(invocation)
+            installation.location.deleteDir()
+        }
     }
 
     protected Specification getSpec(IMethodInvocation invocation) {
