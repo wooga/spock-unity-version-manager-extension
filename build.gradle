@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.codehaus.groovy:groovy-all:(2.4,2.5]'
     implementation 'org.spockframework:spock-core:1.2-groovy-2.4'
     implementation 'net.wooga:unity-version-manager-jni:[1,2)'
-    testImplementation 'com.github.stefanbirkner:system-rules:1.18.0'
+    testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
 }
 
 repositories {
