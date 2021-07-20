@@ -46,15 +46,10 @@ repositories {
    mavenCentral()
 }
 
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
-}
-
-javadoc.failOnError = false
-task javadocJar(type: Jar) {
-    archiveClassifier.set('javadoc')
-    from javadoc
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    withJavadocJar()
+    withSourcesJar()
 }
 
 jacocoTestReport {
@@ -64,22 +59,11 @@ jacocoTestReport {
     }
 }
 
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
 publishing {
     publications {
         main(MavenPublication) {
-            artifactId = project.name
             from(components["java"])
-            artifact sourcesJar {
-                classifier "sources"
-            }
-            artifact javadocJar {
-                classifier "javadoc"
-            }
+
             pom {
                 name = 'Spock Unity Version Manager extension'
                 description = 'A extension for Spock to setup and install Unity editors during test.'
@@ -133,6 +117,9 @@ signing {
 postRelease.dependsOn(tasks.publish)
 
 afterEvaluate {
-    tasks."release".dependsOn(tasks.publishToSonatype, tasks.closeAndReleaseSonatypeStagingRepository)
+    tasks."final".dependsOn(tasks.publishToSonatype, tasks.closeAndReleaseSonatypeStagingRepository)
+    tasks."candidate".dependsOn(tasks.publishToSonatype, tasks.closeAndReleaseSonatypeStagingRepository)
+    tasks.publishToSonatype.mustRunAfter(tasks.postRelease)
     tasks.closeSonatypeStagingRepository.mustRunAfter(tasks.publishToSonatype)
+    tasks.publish.mustRunAfter(tasks.release)
 }
