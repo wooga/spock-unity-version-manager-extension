@@ -22,6 +22,7 @@ import groovy.transform.InheritConstructors
 import net.wooga.uvm.Installation
 import org.spockframework.runtime.extension.IMethodInvocation
 import org.spockframework.runtime.model.FeatureInfo
+import org.spockframework.runtime.model.MethodInfo
 
 import java.lang.reflect.Parameter
 
@@ -34,32 +35,20 @@ class UnityInstallationFeatureInterceptor extends UnityInstallationManagingInter
 
     Installation installation
 
+
     private static void injectInstallations(IMethodInvocation invocation, Installation installation) {
         Map<Parameter, Integer> parameters = [:]
         invocation.method.reflection.parameters.eachWithIndex { parameter, i ->
             parameters << [(parameter): i]
         }
-        parameters = parameters.findAll { Installation.equals it.key.type}
 
-        // enlarge arguments array if necessary
-        def lastMyInjectableParameterIndex = parameters*.value.max()
-        lastMyInjectableParameterIndex = lastMyInjectableParameterIndex == null ?
-                0 :
-                lastMyInjectableParameterIndex + 1
-
-        if (invocation.arguments.length < lastMyInjectableParameterIndex) {
-            def newArguments = new Object[lastMyInjectableParameterIndex]
-            System.arraycopy invocation.arguments, 0, newArguments, 0, invocation.arguments.length
-            invocation.arguments = newArguments
-        }
-
-        parameters.each { parameter, i ->
-            if(!invocation.arguments[i]) {
-                invocation.arguments[i] = installation
-            }
-        }
+        parameters.findAll { Installation.class == it.key.type }
+                .each { parameter, i ->
+                    if(!invocation.arguments[i] || invocation.arguments[i] == MethodInfo.MISSING_ARGUMENT) {
+                        invocation.arguments[i] = installation
+                    }
+                }
     }
-
     //execute feature
     @Override
     void interceptFeatureMethod(IMethodInvocation invocation) throws Throwable {
